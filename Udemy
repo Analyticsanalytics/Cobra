@@ -1,0 +1,95 @@
+# Cobra
+It has the venomous things. Open only if you are a Snake Charmer 
+### -*- coding: utf-8 -*-
+"""
+Created on Fri Jun 29 18:18:13 2018
+
+@author: anand.kumar
+"""
+##Importing Libraries
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+##Importing the stored data into the working directory as dataset using panda(pd) an csv file
+dataset=pd.read_csv("Data.csv")
+##To change the format of the variable double click on the dataset and change %0.6g to %0.06f(float with no decimal points)
+
+##To create the matrix of indt variables and depnt variables
+X= dataset.iloc[:, :-1].values
+##iloc[] For indts X, it takes all the rows in the dataset and it takes all the columns except last one
+y= dataset.iloc[:,3].values
+
+
+###For other uses of iloc
+z= dataset.iloc[:,:-2].values
+##Like the last one it will select all the columns excpet the last one
+##The line below will select rows from 1 to 2 only () and all the columns except last one (closed and open interval)
+aa= dataset.iloc[ 1:3 , :-1].values
+aa
+##for qq The lines below will select all the rows starting from row 1 and all the columns except the last one
+##In the zz it will select none of the rows but column o and 4. while selecting columns like this(interval method but not a mathematical interval), it will start from left where the indexing starts from 0.
+qq= dataset.iloc[1: , 1:-1].values
+zz= dataset.iloc[: , [0,4]].values
+
+##It is easy to recognize that an interval that contains both of its endpoints is closed, and it is easy to recognize that an interval that does not contain both of its endpoints is open. However, sometimes we deal with intervals that contains only one of its endpoints or an interval that involves infinity. For instance, consider the following intervals:
+##a ≤ x < b or a < x ≤ b##-∞ < x < ∞ (all real numbers)##x ≥ a or x ≤ a##x > a or x < a
+##In the first intervals, we see that the intervals include one endpoint, but not the other. When this is the case, we don't classify the interval as open or closed, we say that it is a half-open interval or a half-closed interval. We use these two terms interchangeably.
+#The second interval involves infinity. We can look at infinity and negative infinity as endpoints in two ways. On one hand, infinity is a concept, not an actual number, so we can't ever actually reach it. Viewing it this way, we would say the endpoints infinity and negative infinity are not included in the interval, so it is an open interval.
+#On the other hand, when an interval involves infinity as an endpoint, it does include all of the numbers up to it, and since infinity and negative infinity go on forever, the interval does include all of its endpoints. Viewing it this way, we would say the interval is closed.
+##Confused yet? Basically, we say that the interval, -∞ < x < ∞ is both open and closed, and an endpoint of infinity or negative infinity can be thought of as included or not included in an interval.
+##Because of this, when we have an interval that has a number as one of its endpoints and infinity or negative infinity as its other endpoint, as in the third and fourth intervals listed, we can say that if the number endpoint is included in the interval, then the interval is closed (as in the third examples), and if the number endpoint is not included in the interval, then the interval is open (as in the fourth examples).
+##Interval Notation, Number Lines, and Examples
+##Often, intervals of numbers will be expressed using interval notation. To represent an interval using interval notation, we write the endpoints, and separate them by a comma. If the endpoint is included, we use a bracket to indicate this, and if a endpoint is not included, we use parentheses to indicate this. When infinity is an endpoint, we always use parentheses.
+
+##Print index 
+##dir(dataset.index)
+##dataset.index
+##list(dataset)
+##dataset.axes[1].tolist()
+X
+y
+
+###################Missing Values and Imputing them with their respective column means#########################
+
+##Importing the imputer class to fill the missig values by the respective mean or median or mode
+from sklearn.preprocessing import Imputer
+##Parameter Description: missing values(what is the code or number for identifying the missing values: Strategy; which measure of central tendency
+##will be used say mean or median or mode): axis;  row-wise (if axis=1)imputation or column-wise(if axis = 0)))
+##Going to define object with the condtions/parameters according to which imputation will be done.
+imputer = Imputer(missing_values = 'NaN', strategy = 'mean', axis = 0)
+##now defining where to fit the imputation. Like in X(age, gender etc.) which cloumn has missing values
+imputer = Imputer.fit(X[:, 1:3])
+##Now going to impute 
+X[:, 1:3] = imputer.transform(X[:, 1:3])
+
+####################Categorical Data(Recoding them into numerical values)########################
+# Encoding categorical data
+# Encoding the Independent Variable
+##importing the label encoder class
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+
+##Creating the first object of the lable encoder class
+labelencoder_X = LabelEncoder()
+
+##calling the label encoder class and method fit_transform and replacing the text names of the country with numeric codes
+X[:, 0] = labelencoder_X.fit_transform(X[:, 0])
+
+##Creating dummy variables because the upper line replaces names with 0,1,2. So the model will think that 0 is lesser than 1 and will give results accordigly
+##So will create some varible in which this kind of order wount create problem.
+##oneHotEncoder will create number of Dummy columns, depending upon the categories of the input varible
+##In the dataset used it will create three dummy. column one with value "1" for France then second column for Germany in which for Germany it will have value "1" for the rest of the
+##Coutries "0".  
+##Parameter Description: categorical features; [0] specify the column which would be hotencoded.
+onehotencoder = OneHotEncoder(categorical_features = [0])
+
+##Calling the oneHotEncoder object to fit
+X = onehotencoder.fit_transform(X).toarray()
+
+# Encoding the Dependent Variable
+##Creating the oneHotEncoder object
+labelencoder_y = LabelEncoder()
+
+##Calling the oneHotencoder to fit
+y = labelencoder_y.fit_transform(y)
